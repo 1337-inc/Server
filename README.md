@@ -1,8 +1,8 @@
 # Server
 
 ## About
-- This is just a support application of the Captain game.
-- It allows the user to host a server on the local network so that the game can connect to it.
-- Data is exchanged between the server and game and the data is stored by the server in a separate file.
-- Run the server application first before starting the game.
-- The game can be played without the server but the player wont be able to save or load his data without being connected to the server.
+- The server application is a support application for a dektop game called [Captain!!](https://1337inc-captain.website2.me/)
+- The server application connects to your router's IP, starts a server on an open port, and listens for connections from clients.
+- The game can be played without the server program but you wont be able to save or load your game state. But once you start the server, it'll handle all your game data. 
+- You can download the installer for the server [here](https://github.com/1337-inc/Server/releases)
+- Visit the our game repo [here](https://github.com/1337-inc/Captain/) or install the game [here](https://github.com/1337-inc/Captain/releases)
