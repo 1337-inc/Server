@@ -6,3 +6,6 @@
 - The game can be played without the server program but you wont be able to save or load your game state. But once you start the server, it'll handle all your game data. 
 - You can download the installer for the server [here](https://github.com/1337-inc/Server/releases)
 - Visit the our game repo [here](https://github.com/1337-inc/Captain/) or install the game [here](https://github.com/1337-inc/Captain/releases)
+
+
+Note: The program is meant only for Windows and has only been tested on Windows10.
