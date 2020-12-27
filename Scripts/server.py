@@ -1,9 +1,10 @@
-import socket 
+import socket
 import threading
 import pickle
 
 class Server :
     def __init__(self) :
+        """creating a new socket object"""
         self.HEADER = 64
         self.PORT = 5050
         self.SERVER =  socket.gethostbyname(socket.gethostname())
@@ -12,8 +13,14 @@ class Server :
         self.DISCONNECT_MESSAGE = "!DISCONNECT"
 
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.server.bind(self.ADDR)
+        try :
+            self.server.bind(self.ADDR)
+        except Exception as exception :
+            print(exception)
         self.save_dict = {}
+        self.print_list = []
+        self.client_connect = True
+        self.connected = True
 
     def file_access(self) :
         with open("project_data\\savedata.dat","rb") as save_file :
@@ -35,15 +42,14 @@ class Server :
             return msg
 
     def handle_client(self,conn, addr):
-        print(f"[NEW CONNECTION] {addr} connected.")
-
-        connected = True
-        while connected:
+        self.client_connect = True
+        self.print_list += [f"[NEW CONNECTION] {addr} connected."]
+        while self.client_connect:
             try :
                 self.save_dict = self.file_access()
                 msg = self.recieve(conn)
                 if msg == self.DISCONNECT_MESSAGE:
-                    connected = False
+                    self.client_connect = False
                 elif msg == "Save Data" :
                     player_id = conn.recv(5000)
                     try :
@@ -57,7 +63,7 @@ class Server :
                             game_data = conn.recv(5000)
                             #msg = pickle.loads(msg_data)
                             self.save_dict[(name,code)] = game_data
-                            print(self.save_dict)
+                            self.print_list += [self.save_dict]
                             conn.send("Success".encode(self.FORMAT))
                     else :
                         conn.send("Exists".encode(self.FORMAT))
@@ -68,7 +74,7 @@ class Server :
                             conn.send("Success".encode(self.FORMAT))
                 elif msg == "Wipe" :
                     self.save_dict.pop((name,code))
-                    print(f"new dict is ",self.save_dict)
+                    self.print_list += [f"new dict is {self.save_dict}"]
                 elif msg == "Load" :
                     player_id = conn.recv(5000)
                     try :
@@ -92,22 +98,28 @@ class Server :
                         conn.send("New".encode(self.FORMAT))
                 self.file_dump()
             except ConnectionResetError :
-                connected = False
-
+                self.client_connect = False
+        print("Client connection ended")
         conn.close()
-        print(f"[Terminated] connection terminated for {addr}")
-            
+        self.print_list += [f"[Terminated] connection terminated for {addr}"]
 
     def start(self):
+        print("here in start!!")
+        self.print_list += ["[STARTING] server is starting..."]
         self.server.listen()
-        print(f"[LISTENING] Server is listening on {self.SERVER}")
-        while True:
+        self.print_list += [f"[LISTENING] Server is listening on {self.SERVER}"]
+        count_ = 0
+        while self.connected :
+            if count_ == 0 :
+                print("server while")
+                count_ += 1
             conn, addr = self.server.accept()
-            thread = threading.Thread(target=self.handle_client, args=(conn, addr))
+            thread = threading.Thread(target=self.handle_client, args=(conn, addr),daemon=True)
             thread.start()
-            print(f"[ACTIVE CONNECTIONS] {threading.activeCount() - 1}")
+            self.print_list += [f"[ACTIVE CONNECTIONS] {threading.activeCount() - 1}"]
+        print("Server while check ended!")
 
 
-print("[STARTING] server is starting...")
-server = Server()
-server.start()
+if __name__ == "__main__" :
+    server = Server()
+    server.start()
